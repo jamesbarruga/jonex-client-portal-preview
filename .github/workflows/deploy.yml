@@ -1,4 +1,4 @@
-name: Deploy client portal preview
+name: Deploy JoNeX full QA preview
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
-      - name: Build two-file artifact
+      - name: Build QA preview artifact
         env:
           PORTAL_SUPABASE_URL: ${{ secrets.JONEX_PORTAL_SUPABASE_URL }}
           PORTAL_PUBLISHABLE_KEY: ${{ secrets.JONEX_PORTAL_PUBLISHABLE_KEY }}
@@ -32,6 +32,8 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p public
+          cp dashboard.html public/dashboard.html
+          cp login.html public/login.html
           cp client-portal.html public/client-portal.html
           node <<'NODE'
           const fs = require('fs');
@@ -51,7 +53,9 @@ jobs:
           };
           fs.writeFileSync('public/runtime-public-config.js', `window.__JONEX_PUBLIC_CONFIG__ = ${JSON.stringify(config, null, 2)};\n`);
           NODE
-          test "$(find public -maxdepth 1 -type f | wc -l | tr -d ' ')" = "2"
+          test "$(find public -maxdepth 1 -type f | wc -l | tr -d ' ')" = "4"
+          test -f public/dashboard.html
+          test -f public/login.html
           test -f public/client-portal.html
           test -f public/runtime-public-config.js
       - uses: actions/upload-pages-artifact@v3

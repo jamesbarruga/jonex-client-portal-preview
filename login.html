@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign in · JoNeX Agency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="runtime-public-config.js"></script>
+<style>
+  /* ============================================================
+     JONEX DESIGN TOKENS
+     ============================================================ */
+  :root {
+    --bg:       #05070D;
+    --surface:  #111115;
+    --surface2: #18181d;
+    --border:   #26262e;
+    --border2:  #32323c;
+    --text:     #e8e8f0;
+    --muted:    #7c7c94;
+    --blue:     #4f8ef7;
+    --blue-dim: rgba(79,142,247,.13);
+    --green:    #22c55e;
+    --amber:    #f59e0b;
+    --rose:     #f43f5e;
+    --purple:   #a855f7;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ============================================================
+     BACKGROUND LAYERS (blobs, stars, noise)
+     ============================================================ */
+  .bg-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .blobs {
+    overflow: hidden;
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  .blob-1 {
+    width: 520px; height: 520px;
+    background: rgba(79,142,247,.18);
+    top: -100px; left: -120px;
+    animation:
+      blob-fade 1.6s cubic-bezier(.4,0,.2,1) 0.30s forwards,
+      blob-drift-1 22s ease-in-out 1.6s infinite;
+  }
+
+  .blob-2 {
+    width: 420px; height: 420px;
+    background: rgba(34,197,94,.08);
+    bottom: -80px; right: -100px;
+    animation:
+      blob-fade 1.6s cubic-bezier(.4,0,.2,1) 0.45s forwards,
+      blob-drift-2 26s ease-in-out 1.6s infinite;
+  }
+
+  .blob-3 {
+    width: 360px; height: 360px;
+    background: rgba(168,85,247,.06);
+    top: 40%; left: 60%;
+    animation:
+      blob-fade 1.6s cubic-bezier(.4,0,.2,1) 0.55s forwards,
+      blob-drift-3 30s ease-in-out 1.6s infinite;
+  }
+
+  @keyframes blob-fade {
+    to { opacity: 0; }
+  }
+
+  @keyframes blob-drift-1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(40px, 30px) scale(1.05); }
+  }
+  @keyframes blob-drift-2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(-30px, -40px) scale(1.08); }
+  }
+  @keyframes blob-drift-3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(-50px, 20px) scale(.95); }
+  }
+
+  /* Stars */
+  .stars {
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0;
+    animation:
+      star-fade 1.8s ease-out 0.40s forwards,
+      star-twinkle 4s ease-in-out 2.2s infinite;
+  }
+  @keyframes star-fade { to { opacity: 0; } }
+  @keyframes star-twinkle {
+    0%, 100% { opacity: 0; }
+    50%      { opacity: 0; }
+  }
+
+  /* Subtle noise overlay */
+  .noise {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' /></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
+    opacity: 0.03;
+    mix-blend-mode: overlay;
+  }
+
+  /* ============================================================
+     LAYOUT
+     ============================================================ */
+  .page {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 32px;
+  }
+
+  .auth-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1200px;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(.2,.8,.2,1);
+  }
+
+  /* ============================================================
+     LOGO
+     ============================================================ */
+  .logo {
+    width: 56px; height: 56px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.8) rotate(-30deg);
+    animation: logo-in 0.9s cubic-bezier(.34, 1.56, .64, 1) 0.15s forwards;
+  }
+  .logo svg {
+    width: 100%; height: 100%;
+    filter: drop-shadow(0 0 18px rgba(79,142,247,.35));
+  }
+  @keyframes logo-in {
+    to { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+
+  /* ============================================================
+     TEXT (headline + subtitle)
+     ============================================================ */
+  .headline {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-align: center;
+    margin-bottom: 8px;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: text-in 0.7s cubic-bezier(.2,.8,.2,1) 0.25s forwards;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 28px;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: text-in 0.7s cubic-bezier(.2,.8,.2,1) 0.40s forwards;
+  }
+
+  @keyframes text-in {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============================================================
+     OAUTH BUTTONS
+     ============================================================ */
+  .oauth-stack {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .oauth-btn {
+    width: 100%;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .18s, border-color .18s, transform .12s;
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  .oauth-btn:hover {
+    background: var(--surface2);
+    border-color: var(--border2);
+  }
+  .oauth-btn:active { transform: translateY(0) scale(.99); }
+
+  .oauth-btn .gicon {
+    width: 18px; height: 18px;
+  }
+  .oauth-btn-google { animation: btn-in 0.6s cubic-bezier(.2,.8,.2,1) 0.55s forwards; }
+  .oauth-btn-ms     { animation: btn-in 0.6s cubic-bezier(.2,.8,.2,1) 0.65s forwards; }
+
+  @keyframes btn-in {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============================================================
+     OR DIVIDER
+     ============================================================ */
+  .divider {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+    opacity: 0;
+    animation: fade-in 0.5s ease-out 0.75s forwards;
+  }
+  .divider::before,
+  .divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .divider span {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  @keyframes fade-in { to { opacity: 1; } }
+
+  /* ============================================================
+     EMAIL CTA (light primary)
+     ============================================================ */
+  .email-cta {
+    width: 100%;
+    height: 46px;
+    background: #d8d8df;
+    color: #08080a;
+    border: none;
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .15s, transform .12s;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: btn-in 0.6s cubic-bezier(.2,.8,.2,1) 0.85s forwards;
+  }
+  .email-cta:hover { background: #ffffff; }
+  .email-cta:active { transform: translateY(0) scale(.99); }
+
+  /* ============================================================
+     SIGN IN LINK
+     ============================================================ */
+  .signin-line {
+    margin-top: 22px;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    opacity: 0;
+    animation: fade-in 0.6s ease-out 1.20s forwards;
+  }
+  .signin-line a {
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color .15s;
+  }
+  .signin-line a:hover { color: var(--blue); }
+
+  /* ============================================================
+     STAGE 2 — EMAIL FORM (layered slide-up transition)
+     Both .cta-slot and .form-slot use grid-template-rows
+     to swap height smoothly with no layout jump.
+     ============================================================ */
+  .cta-slot {
+    width: 100%;
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows .55s cubic-bezier(.2,.8,.2,1);
+  }
+  .cta-slot.collapsed {
+    grid-template-rows: 0fr;
+  }
+  .cta-wrapper {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .form-slot {
+    width: 100%;
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .55s cubic-bezier(.2,.8,.2,1);
+  }
+  .form-slot.expanded {
+    grid-template-rows: 1fr;
+  }
+  .form-wrapper {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .email-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* Pre-entry state — sits below, scaled, blurred, invisible */
+    transform: translateY(40px) scale(0.95);
+    opacity: 0;
+    filter: blur(2px);
+    transform-origin: center top;
+    pointer-events: none;
+    will-change: transform, opacity, filter;
+    /* Top padding ensures form has breathing room from CTA when slot first opens */
+    padding-top: 4px;
+  }
+  .email-form.active {
+    animation: form-rise 0.55s cubic-bezier(.2,.8,.2,1) forwards;
+    pointer-events: auto;
+  }
+  .email-form.exiting {
+    animation: form-fall 0.32s cubic-bezier(.4,0,.2,1) forwards;
+    pointer-events: none;
+  }
+
+  @keyframes form-rise {
+    0%   { transform: translateY(40px) scale(0.95); opacity: 0; filter: blur(2px); }
+    60%  { opacity: 1; filter: blur(0); }
+    100% { transform: translateY(0) scale(1); opacity: 1; filter: blur(0); }
+  }
+  @keyframes form-fall {
+    0%   { transform: translateY(0) scale(1); opacity: 1; filter: blur(0); }
+    100% { transform: translateY(30px) scale(0.96); opacity: 0; filter: blur(2px); }
+  }
+
+  /* Subtle stagger for fields (within the rising form, much shorter) */
+  .email-form.active .field-group {
+    opacity: 0;
+    animation: field-fade 0.35s ease-out forwards;
+  }
+  .email-form.active .field-group.f1 { animation-delay: 0.18s; }
+  .email-form.active .field-group.f2 { animation-delay: 0.24s; }
+  .email-form.active .field-group.f3 { animation-delay: 0.30s; }
+
+  @keyframes field-fade {
+    to { opacity: 1; }
+  }
+
+  /* ============================================================
+     RECEDE / ARRIVE — for "old content" (CTA + signin line)
+     and "background" (OAuth stack) micro-parallax
+     ============================================================ */
+  .recede {
+    transform: translateY(-10px) translateZ(-40px);
+    opacity: 0;
+    filter: blur(4px);
+    pointer-events: none;
+    transition:
+      transform .42s cubic-bezier(.4,0,.2,1),
+      opacity   .35s ease-out,
+      filter    .35s ease-out;
+  }
+  .arrive {
+    animation: arrive-fade 0.45s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  @keyframes arrive-fade {
+    0%   { transform: translateY(8px); opacity: 0; filter: blur(2px); }
+    100% { transform: translateY(0);   opacity: 1; filter: blur(0); }
+  }
+
+  /* OAuth stack = "background" layer — barely moves (slowest parallax) */
+  .oauth-stack.shifted {
+    transform: translateY(-3px);
+    opacity: 0.78;
+    transition: transform .45s cubic-bezier(.4,0,.2,1), opacity .4s ease-out;
+  }
+  .oauth-stack {
+    transition: transform .45s cubic-bezier(.4,0,.2,1), opacity .4s ease-out;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .field-input {
+    width: 100%;
+    height: 44px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 0 14px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color .15s, background .15s;
+  }
+  .field-input:focus {
+    border-color: var(--blue);
+    background: var(--surface);
+  }
+  .field-input::placeholder { color: #4d4d5e; }
+
+  .password-wrap {
+    position: relative;
+  }
+  .password-wrap .eye {
+    position: absolute;
+    right: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 13px;
+    transition: color .15s;
+  }
+  .password-wrap .eye:hover { color: var(--text); }
+
+  .form-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -2px;
+    font-size: 12px;
+  }
+  .form-meta-row label {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .form-meta-row input[type="checkbox"] {
+    accent-color: var(--blue);
+    cursor: pointer;
+  }
+  .form-meta-row a {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .form-meta-row a:hover { text-decoration: underline; }
+
+  .submit-btn {
+    width: 100%;
+    height: 46px;
+    background: #f4f4f7;
+    color: #08080a;
+    border: none;
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .15s, transform .12s;
+    margin-top: 4px;
+  }
+  .submit-btn:hover { background: #ffffff; }
+  .submit-btn:active { transform: scale(.99); }
+  .submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .back-link {
+    margin-top: 14px;
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color .15s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: center;
+  }
+  .back-link:hover { color: var(--text); }
+
+  /* ============================================================
+     FOOTER
+     ============================================================ */
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11.5px;
+    color: var(--muted);
+    padding-top: 16px;
+    opacity: 0;
+    animation: fade-in 0.7s ease-out 1.40s forwards;
+  }
+  .footer-right {
+    display: flex;
+    gap: 22px;
+  }
+  .footer a {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color .15s;
+  }
+  .footer a:hover { color: var(--text); }
+  .footer .version {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+  }
+
+  /* ============================================================
+     TOAST
+     ============================================================ */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s, transform .25s;
+    z-index: 100;
+    box-shadow: 0 8px 32px rgba(0,0,0,.6);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast i { color: var(--green); }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 480px) {
+    .page { padding: 18px 20px; }
+    .auth-card { max-width: 100%; }
+    .headline { font-size: 22px; }
+    .footer { flex-direction: column; gap: 8px; }
+  }
+
+  /* Reduce motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     BACKGROUND LAYERS
+     ============================================================ -->
+<div class="bg-layer blobs">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+<div class="bg-layer stars" id="stars"></div>
+<div class="bg-layer noise"></div>
+
+<!-- ============================================================
+     PAGE
+     ============================================================ -->
+<div class="page">
+
+  <div class="auth-wrap">
+    <div class="auth-card" id="authCard">
+
+      <!-- Logo -->
+      <div class="logo">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <defs>
+            <linearGradient id="lgrad" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#79a8ff"/>
+              <stop offset="1" stop-color="#4f8ef7"/>
+            </linearGradient>
+          </defs>
+          <!-- Ring of dots (Datago-style) -->
+          <g fill="url(#lgrad)">
+            <circle cx="28" cy="6"  r="2.2"/>
+            <circle cx="40.6" cy="9.8" r="2"/>
+            <circle cx="49"  cy="20" r="2"/>
+            <circle cx="50"  cy="34" r="2"/>
+            <circle cx="42"  cy="44.5" r="2"/>
+            <circle cx="28"  cy="48" r="2.2"/>
+            <circle cx="14"  cy="44.5" r="2"/>
+            <circle cx="6"   cy="34" r="2"/>
+            <circle cx="7"   cy="20" r="2"/>
+            <circle cx="15.4" cy="9.8" r="2"/>
+          </g>
+          <!-- Center monogram J -->
+          <path d="M30 19 v12 a4.5 4.5 0 0 1 -4.5 4.5 a4.5 4.5 0 0 1 -4.5 -4.5"
+                stroke="url(#lgrad)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+          <circle cx="30" cy="16" r="1.4" fill="url(#lgrad)"/>
+        </svg>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="headline">Welcome to JoNeX</h1>
+      <p class="subtitle" id="loginSubtitle">Sign in with your Supabase account</p>
+
+      <!-- ============================================================
+           STAGE 1A — OAuth (stays visible across both stages)
+           ============================================================ -->
+      <div class="oauth-stack" id="oauthStack">
+
+        <!-- Google -->
+        <button class="oauth-btn oauth-btn-google" onclick="handleOAuth('Google')">
+          <svg class="gicon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Continue with Google
+        </button>
+
+        <!-- Microsoft -->
+        <button class="oauth-btn oauth-btn-ms" onclick="handleOAuth('Microsoft')">
+          <svg class="gicon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#F25022" d="M2 2h10v10H2z"/>
+            <path fill="#00A4EF" d="M2 12h10v10H2z"/>
+            <path fill="#7FBA00" d="M12 2h10v10H12z"/>
+            <path fill="#FFB900" d="M12 12h10v10H12z"/>
+          </svg>
+          Continue with Microsoft
+        </button>
+
+        <!-- OR Divider -->
+        <div class="divider"><span>OR</span></div>
+      </div>
+
+      <!-- ============================================================
+           STAGE 1B — Email CTA (lives in a collapsible slot so the
+           card height swaps smoothly with form-slot's expansion)
+           ============================================================ -->
+      <div class="cta-slot" id="ctaSlot">
+        <div class="cta-wrapper">
+          <button class="email-cta" id="emailCta" onclick="showEmailForm()">Continue with Email</button>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           STAGE 2 — Email/Password Form (slides up over Stage 1B)
+           Wrapped in a height-animating slot so the card grows smoothly.
+           ============================================================ -->
+      <div class="form-slot" id="formSlot">
+        <div class="form-wrapper">
+          <form class="email-form" id="stage2" onsubmit="handleSignin(event)">
+            <div class="field-group f1">
+              <label class="field-label">Email Address</label>
+              <input class="field-input" id="emailInp" type="email" placeholder="owner@jonex.local" required />
+            </div>
+
+            <div class="field-group f2">
+              <label class="field-label">Password</label>
+              <div class="password-wrap">
+                <input class="field-input" id="pwd" type="password" placeholder="••••••••" minlength="8" required />
+                <i class="fa-solid fa-eye eye" onclick="togglePwd(this)"></i>
+              </div>
+            </div>
+
+            <div class="field-group f3">
+              <button class="submit-btn" type="submit">Sign In</button>
+              <a class="back-link" onclick="showStage1()">
+                <i class="fa-solid fa-arrow-left" style="font-size:11px;"></i>
+                Back to other options
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Sign In / Sign Up toggle line -->
+      <div class="signin-line" id="signinLine">
+        Already have an account? <a onclick="signIn()">Sign In</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <div class="footer">
+    <div class="version">© 2026 · JoNeX Agency v1.6</div>
+    <div class="footer-right">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Support</a>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <i class="fa-solid fa-circle-check"></i>
+  <span id="toastMsg">Welcome!</span>
+</div>
+
+<script>
+  /* ============================================================
+     STATE
+     ============================================================ */
+  const D = {
+    stage: 1,
+    parallaxReady: false,
+    transitioning: false,
+  };
+  function runtimeText(value){return String(value||'').trim();}
+  function isPlaceholderRuntimeValue(value){
+    const text=runtimeText(value);
+    return !text||/^placeholder/i.test(text)||/^replace/i.test(text)||/^your[-_ ]/i.test(text)||/^<[^>]+>$/.test(text)||/^todo$/i.test(text)||/^changeme$/i.test(text);
+  }
+  function isValidHostedPublicUrl(value){
+    if(isPlaceholderRuntimeValue(value))return false;
+    try{
+      const parsed=new URL(value);
+      return parsed.protocol==='https:'&&parsed.hostname.endsWith('.supabase.co');
+    }catch(_error){return false;}
+  }
+  function isValidPublishableKey(value){
+    const text=runtimeText(value);
+    return !isPlaceholderRuntimeValue(text)&&text.length>=20&&!/\s/.test(text)&&!/service[_-]?role|secret/i.test(text);
+  }
+  function getRuntimeHostedConfig(surface){
+    const runtime=window.__JONEX_PUBLIC_CONFIG__;
+    if(!runtime||typeof runtime!=='object'||runtime.env!=='hosted-dev')return null;
+    const dashboardStorageKey=runtimeText(runtime.dashboardStorageKey);
+    const portalStorageKey=runtimeText(runtime.portalStorageKey);
+    if(!dashboardStorageKey||!portalStorageKey||dashboardStorageKey===portalStorageKey)return null;
+    const url=runtimeText(surface==='portal'?runtime.portalSupabaseUrl:runtime.dashboardSupabaseUrl);
+    const publishableKey=runtimeText(surface==='portal'?runtime.portalPublishableKey:runtime.dashboardPublishableKey);
+    if(!isValidHostedPublicUrl(url)||!isValidPublishableKey(publishableKey))return null;
+    return {
+      url,
+      publishableKey,
+      storageKey:surface==='portal'?portalStorageKey:dashboardStorageKey,
+      email:runtimeText(runtime.dashboardEmail)||'hosted-dashboard-dev@jonex.local',
+      label:'hosted dev Supabase',
+      next:'dashboard.html?supabase=hosted-dev'
+    };
+  }
+  const SUPABASE_CONFIGS = {
+    local: {
+      url: 'http://127.0.0.1:54321',
+      publishableKey: 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH',
+      storageKey: 'jonex-agency-local-auth',
+      email: 'owner@jonex.local',
+      label: 'local Supabase',
+      next: 'dashboard.html?supabase=1'
+    },
+    hostedDev: {
+      url: '',
+      publishableKey: '',
+      storageKey: 'jonex-agency-hosted-dev-auth',
+      email: 'hosted-dashboard-dev@jonex.local',
+      label: 'hosted dev Supabase',
+      next: 'dashboard.html?supabase=hosted-dev'
+    }
+  };
+  function getSupabaseConfig() {
+    const next = new URLSearchParams(location.search).get('next') || '';
+    const directMode = new URLSearchParams(location.search).get('supabase');
+    const wantsHostedDev = directMode === 'hosted-dev' || next.includes('supabase=hosted-dev');
+    const hostedConfig = wantsHostedDev ? getRuntimeHostedConfig('dashboard') : null;
+    if (hostedConfig) return hostedConfig;
+    return SUPABASE_CONFIGS.local;
+  }
+  const SUPABASE_CONFIG = getSupabaseConfig();
+  const supabaseClient = window.supabase?.createClient
+    ? window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.publishableKey, {
+        auth: { persistSession: true, storageKey: SUPABASE_CONFIG.storageKey }
+      })
+    : null;
+
+  /* ============================================================
+     STARS — generate random twinkles
+     ============================================================ */
+  (function makeStars() {
+    const wrap = document.getElementById('stars');
+    const count = 60;
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top  = Math.random() * 100 + '%';
+      s.style.animationDelay = (Math.random() * 4) + 's, ' + (2.2 + Math.random() * 3) + 's';
+      const size = Math.random() < 0.2 ? 3 : 2;
+      s.style.width = size + 'px';
+      s.style.height = size + 'px';
+      frag.appendChild(s);
+    }
+    wrap.appendChild(frag);
+  })();
+
+  /* ============================================================
+     PARALLAX — activate after 1.9s
+     ============================================================ */
+  setTimeout(() => { D.parallaxReady = true; }, 1900);
+
+  document.addEventListener('mousemove', (e) => {
+    if (!D.parallaxReady) return;
+    const card = document.getElementById('authCard');
+    const x = (e.clientX / window.innerWidth - 0.5) * 2;   // -1 to 1
+    const y = (e.clientY / window.innerHeight - 0.5) * 2;
+    const tiltX = -y * 2.5;
+    const tiltY =  x * 2.5;
+    card.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+
+    // Background blobs move opposite for depth
+    const blobs = document.querySelectorAll('.blob');
+    blobs.forEach((b, i) => {
+      const factor = (i + 1) * 8;
+      b.style.translate = `${-x * factor}px ${-y * factor}px`;
+    });
+  });
+
+  /* ============================================================
+     STAGE TOGGLE — layered parallax transition
+     ============================================================ */
+  function showEmailForm() {
+    if (D.stage === 2 || D.transitioning) return;
+    D.stage = 2;
+    D.transitioning = true;
+
+    const cta      = document.getElementById('emailCta');
+    const ctaSlot  = document.getElementById('ctaSlot');
+    const slot     = document.getElementById('formSlot');
+    const form     = document.getElementById('stage2');
+    const oauth    = document.getElementById('oauthStack');
+    const signLine = document.getElementById('signinLine');
+    const card     = document.getElementById('authCard');
+
+    // Pause card-tilt parallax during transition (avoids fighting with our transforms)
+    D.parallaxReady = false;
+    card.style.transform = '';
+
+    // Layer 1 (background): OAuth stack — barely shifts (slowest)
+    oauth.classList.add('shifted');
+
+    // Layer 2 (old content): CTA + signin-line recede (medium speed)
+    cta.classList.add('recede');
+    signLine.classList.add('recede');
+
+    // Smooth height swap — CTA slot collapses, form slot expands together (no jumps)
+    ctaSlot.classList.add('collapsed');
+    slot.classList.add('expanded');
+
+    // Layer 3 (new content): Form rises after old content has begun fading
+    setTimeout(() => {
+      form.classList.add('active');
+
+      // Update sign-in line text and re-arrive after form starts landing
+      setTimeout(() => {
+        signLine.innerHTML = `Don't have an account? <a onclick="toSignup()">Sign Up</a>`;
+        signLine.classList.remove('recede');
+        signLine.classList.add('arrive');
+
+        // Auto-focus email input as form lands (cursor blinks immediately)
+        document.getElementById('emailInp').focus();
+      }, 200);
+
+      setTimeout(() => {
+        D.transitioning = false;
+        D.parallaxReady = true;
+      }, 600);
+    }, 220);
+  }
+
+  function showStage1() {
+    if (D.stage === 1 || D.transitioning) return;
+    D.stage = 1;
+    D.transitioning = true;
+
+    const cta      = document.getElementById('emailCta');
+    const ctaSlot  = document.getElementById('ctaSlot');
+    const slot     = document.getElementById('formSlot');
+    const form     = document.getElementById('stage2');
+    const oauth    = document.getElementById('oauthStack');
+    const signLine = document.getElementById('signinLine');
+    const card     = document.getElementById('authCard');
+
+    D.parallaxReady = false;
+    card.style.transform = '';
+
+    // Form falls back down + fades
+    form.classList.add('exiting');
+    signLine.classList.add('recede');
+
+    setTimeout(() => {
+      // Hide form, swap slots back
+      form.classList.remove('active');
+      form.classList.remove('exiting');
+      slot.classList.remove('expanded');
+      ctaSlot.classList.remove('collapsed');
+
+      // Bring CTA back
+      cta.classList.remove('recede');
+      cta.classList.add('arrive');
+
+      // Background returns to normal
+      oauth.classList.remove('shifted');
+
+      // Restore sign-in line
+      signLine.innerHTML = `Already have an account? <a onclick="signIn()">Sign In</a>`;
+      signLine.classList.remove('recede');
+      signLine.classList.add('arrive');
+
+      setTimeout(() => {
+        cta.classList.remove('arrive');
+        signLine.classList.remove('arrive');
+        D.transitioning = false;
+        D.parallaxReady = true;
+      }, 480);
+    }, 320);
+  }
+
+  /* ============================================================
+     ACTIONS
+     ============================================================ */
+  function getNextUrl() {
+    const next = new URLSearchParams(location.search).get('next');
+    return next && next.startsWith('dashboard.html') ? next : SUPABASE_CONFIG.next;
+  }
+
+  function handleOAuth(provider) {
+    toast(`${provider} auth is deferred for Phase 1C`);
+  }
+
+  async function handleSignin(e) {
+    e.preventDefault();
+    if (!supabaseClient) {
+      toast('Supabase client did not load');
+      return;
+    }
+
+    const form = e.currentTarget;
+    const btn = form.querySelector('.submit-btn');
+    const email = document.getElementById('emailInp').value.trim();
+    const password = document.getElementById('pwd').value;
+
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+
+    try {
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      toast('Welcome back to JoNeX!');
+      setTimeout(() => {
+        window.location.href = getNextUrl();
+      }, 350);
+    } catch (err) {
+      toast(err.message || 'Sign in failed');
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  }
+
+  function signIn() {
+    showEmailForm();
+  }
+
+  function toSignup() {
+    toast('Sign up is deferred for Phase 1C');
+  }
+
+  function togglePwd(el) {
+    const inp = document.getElementById('pwd');
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      el.classList.remove('fa-eye');
+      el.classList.add('fa-eye-slash');
+    } else {
+      inp.type = 'password';
+      el.classList.remove('fa-eye-slash');
+      el.classList.add('fa-eye');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const subtitle = document.getElementById('loginSubtitle');
+    const email = document.getElementById('emailInp');
+    if (subtitle) subtitle.textContent = `Sign in with your ${SUPABASE_CONFIG.label} account`;
+    if (email) email.placeholder = SUPABASE_CONFIG.email;
+  });
+
+  /* ============================================================
+     TOAST
+     ============================================================ */
+  let toastTimer;
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+</script>
+
+</body>
+</html>
