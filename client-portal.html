@@ -2155,18 +2155,21 @@ const LOCAL_ACCESS_CONFIG = {
   publishableKey: "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH",
   storageKey: "jonex-client-portal-local-auth",
 };
+const PORTAL_DEMO_REQUESTED = routeParams.get("demo") === "1";
+const PORTAL_DISPLAY_REQUESTED = routeParams.get("display") === "1";
 const HOSTED_PORTAL_REQUESTED = routeParams.get("portal") === "hosted-dev";
-const ACCESS_CONFIG = HOSTED_PORTAL_REQUESTED
-  ? getRuntimeHostedConfig("portal")
+const RUNTIME_HOSTED_PORTAL_CONFIG = getRuntimeHostedConfig("portal");
+const ACCESS_CONFIG = (HOSTED_PORTAL_REQUESTED || (!PORTAL_DEMO_REQUESTED && !PORTAL_DISPLAY_REQUESTED && RUNTIME_HOSTED_PORTAL_CONFIG))
+  ? RUNTIME_HOSTED_PORTAL_CONFIG
   : LOCAL_ACCESS_CONFIG;
 
 let businesses = demoBusinesses;
 let activePage = "today";
 let activeBusinessId = "luma";
 let demoState = "normal";
-let isDisplayMode = routeParams.get("display") === "1";
+let isDisplayMode = PORTAL_DISPLAY_REQUESTED;
 let displayPrivacyOn = routeParams.get("private") !== "0";
-let portalMode = isDisplayMode ? "display" : routeParams.get("demo") === "1" ? "demo" : "auth";
+let portalMode = isDisplayMode ? "display" : PORTAL_DEMO_REQUESTED ? "demo" : "auth";
 let accessClient = null;
 let authUserEmail = "";
 let portalWriteState = {};

@@ -812,6 +812,7 @@
     const publishableKey=runtimeText(surface==='portal'?runtime.portalPublishableKey:runtime.dashboardPublishableKey);
     if(!isValidHostedPublicUrl(url)||!isValidPublishableKey(publishableKey))return null;
     return {
+      mode:'hosted-dev',
       url,
       publishableKey,
       storageKey:surface==='portal'?portalStorageKey:dashboardStorageKey,
@@ -822,6 +823,7 @@
   }
   const SUPABASE_CONFIGS = {
     local: {
+      mode: 'local',
       url: 'http://127.0.0.1:54321',
       publishableKey: 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH',
       storageKey: 'jonex-agency-local-auth',
@@ -830,6 +832,7 @@
       next: 'dashboard.html?supabase=1'
     },
     hostedDev: {
+      mode: 'hosted-dev',
       url: '',
       publishableKey: '',
       storageKey: 'jonex-agency-hosted-dev-auth',
@@ -842,7 +845,7 @@
     const next = new URLSearchParams(location.search).get('next') || '';
     const directMode = new URLSearchParams(location.search).get('supabase');
     const wantsHostedDev = directMode === 'hosted-dev' || next.includes('supabase=hosted-dev');
-    const hostedConfig = wantsHostedDev ? getRuntimeHostedConfig('dashboard') : null;
+    const hostedConfig = (wantsHostedDev || (!directMode && !next)) ? getRuntimeHostedConfig('dashboard') : null;
     if (hostedConfig) return hostedConfig;
     return SUPABASE_CONFIGS.local;
   }
@@ -1021,19 +1024,32 @@
     const password = document.getElementById('pwd').value;
 
     btn.disabled = true;
-    btn.textContent = 'Signing in...';
+    btn.textContent = SUPABASE_CONFIG.mode === 'hosted-dev' ? 'Sending link...' : 'Signing in...';
 
     try {
-      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      const { error } = SUPABASE_CONFIG.mode === 'hosted-dev'
+        ? await supabaseClient.auth.signInWithOtp({
+            email,
+            options: {
+              emailRedirectTo: new URL(getNextUrl(), location.href).href,
+              shouldCreateUser: false
+            }
+          })
+        : await supabaseClient.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      toast('Welcome back to JoNeX!');
-      setTimeout(() => {
-        window.location.href = getNextUrl();
-      }, 350);
+      if (SUPABASE_CONFIG.mode === 'hosted-dev') {
+        toast('Check your email for the JoNeX sign-in link.');
+        btn.textContent = 'Link sent';
+      } else {
+        toast('Welcome back to JoNeX!');
+        setTimeout(() => {
+          window.location.href = getNextUrl();
+        }, 350);
+      }
     } catch (err) {
       toast(err.message || 'Sign in failed');
       btn.disabled = false;
-      btn.textContent = 'Sign In';
+      btn.textContent = SUPABASE_CONFIG.mode === 'hosted-dev' ? 'Send sign-in link' : 'Sign In';
     }
   }
 
@@ -1061,8 +1077,18 @@
   document.addEventListener('DOMContentLoaded', () => {
     const subtitle = document.getElementById('loginSubtitle');
     const email = document.getElementById('emailInp');
-    if (subtitle) subtitle.textContent = `Sign in with your ${SUPABASE_CONFIG.label} account`;
+    const passwordGroup = document.querySelector('.field-group.f2');
+    const password = document.getElementById('pwd');
+    const submit = document.querySelector('.submit-btn');
+    if (subtitle) subtitle.textContent = SUPABASE_CONFIG.mode === 'hosted-dev'
+      ? 'Enter your approved email to receive a JoNeX sign-in link'
+      : `Sign in with your ${SUPABASE_CONFIG.label} account`;
     if (email) email.placeholder = SUPABASE_CONFIG.email;
+    if (SUPABASE_CONFIG.mode === 'hosted-dev') {
+      if (passwordGroup) passwordGroup.style.display = 'none';
+      if (password) password.required = false;
+      if (submit) submit.textContent = 'Send sign-in link';
+    }
   });
 
   /* ============================================================

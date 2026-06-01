@@ -2085,7 +2085,9 @@ const D = {
 
 const TYPE_ICON={Dental:'🦷',Salon:'✂️',Barbershop:'💈',Spa:'🛁'};
 const STATUS_LABEL={active:'Active',trial:'Trial',issue:'Issue',building:'Building'};
-const SUPABASE_MODE_PARAM = new URLSearchParams(location.search).get('supabase');
+const DASHBOARD_ROUTE_PARAMS = new URLSearchParams(location.search);
+const SUPABASE_MODE_PARAM = DASHBOARD_ROUTE_PARAMS.get('supabase');
+const DASHBOARD_DEMO_MODE = DASHBOARD_ROUTE_PARAMS.get('demo') === '1' || SUPABASE_MODE_PARAM === 'demo';
 function runtimeText(value){return String(value||'').trim();}
 function isPlaceholderRuntimeValue(value){
   const text=runtimeText(value);
@@ -2142,11 +2144,13 @@ const SUPABASE_CONFIGS = {
   }
 };
 const RUNTIME_HOSTED_DASHBOARD_CONFIG = getRuntimeHostedConfig('dashboard');
-const SUPABASE_ACTIVE_CONFIG = SUPABASE_MODE_PARAM === 'hosted-dev'
-  ? RUNTIME_HOSTED_DASHBOARD_CONFIG
-  : (SUPABASE_MODE_PARAM === '1' || localStorage.getItem('jonex:supabase-live') === '1')
-    ? SUPABASE_CONFIGS.local
-    : null;
+const SUPABASE_ACTIVE_CONFIG = DASHBOARD_DEMO_MODE
+  ? null
+  : SUPABASE_MODE_PARAM === 'hosted-dev'
+    ? RUNTIME_HOSTED_DASHBOARD_CONFIG
+    : (SUPABASE_MODE_PARAM === '1' || localStorage.getItem('jonex:supabase-live') === '1')
+      ? SUPABASE_CONFIGS.local
+      : RUNTIME_HOSTED_DASHBOARD_CONFIG;
 const SUPABASE_LIVE_FLAG = Boolean(SUPABASE_ACTIVE_CONFIG);
 const SUPABASE_LOCAL = SUPABASE_CONFIGS.local;
 class AuthRequiredError extends Error{
@@ -2687,7 +2691,7 @@ function renderAIConfigPage(){
   const target=document.getElementById('aiconfig-local-status');
   if(!target)return;
   if(!D.supabaseLive){
-    target.innerHTML=`<div class="card-flat" style="padding:20px;"><div style="font-size:13px;font-weight:700;margin-bottom:6px;">Supabase mode inactive</div><div style="font-size:12px;color:var(--muted);">Open <span class="mono">dashboard.html?supabase=1</span> for local setup or <span class="mono">dashboard.html?supabase=hosted-dev</span> for private hosted-dev readback.</div></div>`;
+    target.innerHTML=`<div class="card-flat" style="padding:20px;"><div style="font-size:13px;font-weight:700;margin-bottom:6px;">Demo mode only</div><div style="font-size:12px;color:var(--muted);line-height:1.6;">This view is using built-in demo data. Open <span class="mono">dashboard.html</span> or <span class="mono">dashboard.html?supabase=hosted-dev</span> on the hosted preview to sign in and read from Supabase. Use <span class="mono">dashboard.html?demo=1</span> only for visual fallback.</div></div>`;
     return;
   }
   const selected=D.clients.find(c=>c.id===(_curClientId||D.clients[0]?.id))||D.clients[0];
