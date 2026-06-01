@@ -1,0 +1,61 @@
+name: Deploy client portal preview
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Build two-file artifact
+        env:
+          PORTAL_SUPABASE_URL: ${{ secrets.JONEX_PORTAL_SUPABASE_URL }}
+          PORTAL_PUBLISHABLE_KEY: ${{ secrets.JONEX_PORTAL_PUBLISHABLE_KEY }}
+          DASHBOARD_SUPABASE_URL: ${{ secrets.JONEX_DASHBOARD_SUPABASE_URL }}
+          DASHBOARD_PUBLISHABLE_KEY: ${{ secrets.JONEX_DASHBOARD_PUBLISHABLE_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p public
+          cp client-portal.html public/client-portal.html
+          node <<'NODE'
+          const fs = require('fs');
+          const required = ['PORTAL_SUPABASE_URL', 'PORTAL_PUBLISHABLE_KEY'];
+          for (const name of required) {
+            if (!process.env[name]) throw new Error(`${name} is missing`);
+          }
+          const config = {
+            env: 'hosted-dev',
+            dashboardSupabaseUrl: process.env.DASHBOARD_SUPABASE_URL || process.env.PORTAL_SUPABASE_URL,
+            dashboardPublishableKey: process.env.DASHBOARD_PUBLISHABLE_KEY || process.env.PORTAL_PUBLISHABLE_KEY,
+            portalSupabaseUrl: process.env.PORTAL_SUPABASE_URL,
+            portalPublishableKey: process.env.PORTAL_PUBLISHABLE_KEY,
+            dashboardStorageKey: 'jonex-agency-hosted-dev-auth',
+            portalStorageKey: 'jonex-client-portal-hosted-dev-auth',
+            dashboardEmail: 'hosted-dashboard-dev@jonex.local'
+          };
+          fs.writeFileSync('public/runtime-public-config.js', `window.__JONEX_PUBLIC_CONFIG__ = ${JSON.stringify(config, null, 2)};\n`);
+          NODE
+          test "$(find public -maxdepth 1 -type f | wc -l | tr -d ' ')" = "2"
+          test -f public/client-portal.html
+          test -f public/runtime-public-config.js
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - id: deployment
+        uses: actions/deploy-pages@v4
