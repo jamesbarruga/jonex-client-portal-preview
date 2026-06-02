@@ -3011,7 +3011,31 @@ function redirectToSupabaseLogin(){
   const next=encodeURIComponent(SUPABASE_ACTIVE_CONFIG?.next||SUPABASE_CONFIGS.local.next);
   window.location.href=`login.html?next=${next}`;
 }
+function wait(ms){
+  return new Promise(resolve=>setTimeout(resolve,ms));
+}
+function isFreshAuthRetryableError(error){
+  const text=`${error?.code||''} ${error?.message||''} ${error?.hint||''}`.toLowerCase();
+  return text.includes('jwt issued at future')||text.includes('pgrst303');
+}
 async function loadSupabaseDashboardData(){
+  const attempts=SUPABASE_LIVE_FLAG?3:1;
+  let lastError=null;
+  for(let attempt=0;attempt<attempts;attempt++){
+    try{
+      return await loadSupabaseDashboardDataOnce();
+    }catch(error){
+      lastError=error;
+      if(attempt<attempts-1&&isFreshAuthRetryableError(error)){
+        await wait(1200*(attempt+1));
+        continue;
+      }
+      throw error;
+    }
+  }
+  throw lastError;
+}
+async function loadSupabaseDashboardDataOnce(){
   if(!SUPABASE_LIVE_FLAG)return false;
   if(!window.supabase?.createClient)throw new Error('Supabase client library did not load');
   const config=SUPABASE_ACTIVE_CONFIG;
