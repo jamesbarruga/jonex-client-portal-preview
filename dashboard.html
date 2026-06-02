@@ -423,7 +423,8 @@ header span[style*="background:var(--green)"]{animation:livePulse 2s infinite;}
   #client-detail [style*="grid-template-columns:1.2fr .7fr .7fr .8fr .7fr"],
   #client-detail [style*="grid-template-columns:1fr 1fr 1fr .7fr"],
   #client-detail [style*="grid-template-columns:52px .8fr 1fr 1fr"],
-  #aiconfig-local-status [style*="grid-template-columns:1fr 360px"]{grid-template-columns:1fr!important;}
+  #aiconfig-local-status [style*="grid-template-columns:1fr 360px"],
+  #aiconfig-local-status [style*="grid-template-columns:minmax(0,1fr) 380px"]{grid-template-columns:1fr!important;}
   #client-detail [style*="white-space:pre-wrap"]{overflow:auto!important;}
   #client-detail a,
   #client-detail pre,
@@ -1274,7 +1275,7 @@ header button[onclick="toggleDevDrop()"]:hover{border-color:var(--blue);backgrou
   <!-- ══ AI & INTEGRATIONS ══ -->
   <div id="page-aiconfig" class="page">
     <div style="font-size:20px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px;">AI & Integrations</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:20px;">Local setup state only. Provider publishing stays blocked until a keyed phase is approved.</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px;">A polished, truthful control layer for client setup, receptionist prompts, and provider readiness.</div>
     <div id="aiconfig-local-status"></div>
   </div>
 
@@ -2691,52 +2692,139 @@ function renderAIConfigPage(){
   const target=document.getElementById('aiconfig-local-status');
   if(!target)return;
   if(!D.supabaseLive){
-    target.innerHTML=`<div class="card-flat" style="padding:20px;"><div style="font-size:13px;font-weight:700;margin-bottom:6px;">Demo mode only</div><div style="font-size:12px;color:var(--muted);line-height:1.6;">This view is using built-in demo data. Open <span class="mono">dashboard.html</span> or <span class="mono">dashboard.html?supabase=hosted-dev</span> on the hosted preview to sign in and read from Supabase. Use <span class="mono">dashboard.html?demo=1</span> only for visual fallback.</div></div>`;
+    target.innerHTML=`<div class="card-flat" style="padding:22px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(79,142,247,.12),rgba(168,85,247,.08) 52%,rgba(17,17,21,.96));">
+      <div style="max-width:680px;position:relative;">
+        <div style="font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.1em;font-weight:800;margin-bottom:8px;">Preview Mode</div>
+        <div style="font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:8px;">AI & Integrations needs a Supabase session</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7;">This page is intentionally quiet in demo mode. Open the hosted dashboard and sign in to see the real Supabase-backed setup state, provider placeholders, and client configuration map.</div>
+      </div>
+    </div>`;
     return;
   }
   const selected=D.clients.find(c=>c.id===(_curClientId||D.clients[0]?.id))||D.clients[0];
   const selectedSetup=setupForClient(selected);
+  const accountByProvider=new Map((D.localSetup?.integrationAccounts||[]).map(account=>[account.provider,account]));
+  const configuredCount=(D.localSetup?.integrationAccounts||[]).filter(account=>account.provider==='supabase'||['ready','connected','local_ready'].includes(account.status)).length;
+  const providerRows=['supabase','retell','cal_com','n8n','twilio'].map(provider=>{
+    const account=accountByProvider.get(provider)||{provider,status:providerPlaceholderStatus(provider),metadata_json:providerPlaceholderSettings(provider)};
+    const display=integrationDisplay(account);
+    const tone=statusTone(account.status,account.provider);
+    const isSupabase=provider==='supabase';
+    const statusLabel=isSupabase
+      ? (isHostedDevMode()?'Hosted readback':'Local source')
+      : display.label;
+    const detail={
+      supabase:isHostedDevMode()
+        ? 'Reads hosted-dev clients, setup rows, bookings, and configuration through RLS.'
+        : 'Local Supabase is the working source for setup drafts and prompt previews.',
+      retell:'Voice agent publishing is designed, but no Retell workspace, phone number, webhook, or live agent is connected.',
+      cal_com:'Service and staff data are ready to map later. No availability checks or real booking writes are enabled.',
+      n8n:'Workflow handoff is planned for manual integrator setup. No workflow execution happens from this page.',
+      twilio:'SMS confirmations and phone routing are deferred until a keyed provider phase.'
+    }[provider]||display.detail;
+    const subline={
+      supabase:isHostedDevMode()?'Public preview uses hosted-dev public config only.':'Local browser plus local Supabase only.',
+      retell:'Placeholder state: prompt snapshots only.',
+      cal_com:'Placeholder state: booking provider blocked.',
+      n8n:'Manual setup later: no API call.',
+      twilio:'Deferred: no SMS traffic.'
+    }[provider]||'Placeholder only.';
+    return {provider,account,tone,statusLabel,detail,subline};
+  });
+  const setupItems=setupCompleteness(selectedSetup);
+  const completeCount=setupItems.filter(item=>item.ok).length;
+  const totalSetup=setupItems.length||1;
+  const setupPct=Math.round((completeCount/totalSetup)*100);
   target.innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 360px;gap:14px;align-items:start;">
-      <div class="card-flat" style="padding:20px;">
-        <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:16px;">
-          <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-plug" style="color:var(--blue);"></i>Provider Boundary Status</div>
-          <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">${isHostedDevMode()?'hosted-dev readback':'local truth'}</span>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;align-items:start;">
+      <div style="display:flex;flex-direction:column;gap:14px;min-width:0;">
+        <div class="card-flat" style="padding:22px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(79,142,247,.14),rgba(17,17,21,.96) 46%,rgba(34,197,94,.08));">
+          <div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;position:relative;">
+            <div>
+              <div style="font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.1em;font-weight:800;margin-bottom:8px;">AI Receptionist Control Layer</div>
+              <div style="font-size:25px;font-weight:800;letter-spacing:-.035em;margin-bottom:8px;">Every provider, clearly mapped.</div>
+              <div style="font-size:13px;color:var(--muted);line-height:1.7;max-width:690px;">This is the real setup surface for JoNeX. Supabase is the source of truth. Voice, booking, automation, and SMS providers stay beautifully visible here, but their labels stay honest until keys and manual provider setup are approved.</div>
+            </div>
+            <div style="flex:0 0 150px;background:rgba(8,8,10,.46);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Environment</div>
+              <div style="font-size:18px;font-weight:800;margin-top:4px;">${isHostedDevMode()?'Hosted Dev':'Local'}</div>
+              <div style="font-size:10px;color:${isHostedDevMode()?'var(--blue)':'var(--green)'};margin-top:6px;">${isHostedDevMode()?'read-only QA':'setup writes allowed'}</div>
+            </div>
+          </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          ${(D.localSetup.integrationAccounts||[]).map(account=>{
-            const tone=statusTone(account.status,account.provider);
-            const meta=account.metadata_json||{};
-            const detail=account.provider==='supabase'
-              ? (isHostedDevMode()?'Private hosted-dev store for synthetic fixture readback.':'Canonical local store. Hosted project is not linked here.')
-              : account.provider==='retell'
-                ? 'Prompt previews and local publish snapshots only. Provider publish is blocked.'
-                : account.provider==='cal_com'
-                  ? 'Service mappings are placeholders. Availability and booking calls are blocked.'
-                  : account.provider==='n8n'
-                    ? 'Manual sidecar later. Workflow execution is blocked.'
-                    : 'Deferred. SMS and phone routing are off.';
-            return `<div class="integration-card">
-              <div style="width:40px;height:40px;background:${tone.bg};border-radius:10px;display:flex;align-items:center;justify-content:center;color:${tone.color};font-size:16px;flex-shrink:0;"><i class="fa-solid ${providerIcon(account.provider)}"></i></div>
-              <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;">${providerLabel(account.provider)}</div><div style="font-size:11px;color:var(--muted);">${h(detail)}</div><div style="font-size:10px;color:var(--muted);margin-top:3px;">${h(meta.webhook_registration||meta.environment||meta.canonical_state||'local placeholder')}</div></div>
-              <div style="font-size:11px;font-weight:700;color:${tone.color};white-space:nowrap;">${tone.label}</div>
-              <button class="btn btn-ghost btn-sm" onclick="toast('${providerLabel(account.provider)} remains ${isHostedDevMode()?'read-only in hosted-dev':'local-only in Phase 6G'}','i')">View</button>
-            </div>`;
-          }).join('')}
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;">
+          ${providerRows.map(row=>`
+            <div class="card" style="padding:14px;min-height:108px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0));">
+              <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
+                <div style="width:34px;height:34px;background:${row.tone.bg};border:1px solid rgba(255,255,255,.06);border-radius:10px;display:flex;align-items:center;justify-content:center;color:${row.tone.color};font-size:14px;"><i class="fa-solid ${providerIcon(row.provider)}"></i></div>
+                <span style="font-size:9px;font-weight:800;border-radius:99px;padding:4px 7px;background:${row.tone.bg};color:${row.tone.color};white-space:nowrap;">${h(row.statusLabel)}</span>
+              </div>
+              <div>
+                <div style="font-size:13px;font-weight:800;margin-bottom:3px;">${providerLabel(row.provider)}</div>
+                <div style="font-size:10px;color:var(--muted);line-height:1.45;">${h(row.subline)}</div>
+              </div>
+            </div>`).join('')}
+        </div>
+
+        <div class="card-flat" style="padding:20px;">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:13px;font-weight:800;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-route" style="color:var(--blue);"></i>Provider Readiness Map</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px;">A truthful control-room view of what is connected, mapped, deferred, and blocked.</div>
+            </div>
+            <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">No live provider traffic</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            ${providerRows.map(row=>`
+              <div class="integration-card" style="align-items:flex-start;background:linear-gradient(90deg,rgba(255,255,255,.025),rgba(255,255,255,0));">
+                <div style="width:42px;height:42px;background:${row.tone.bg};border-radius:12px;display:flex;align-items:center;justify-content:center;color:${row.tone.color};font-size:16px;flex-shrink:0;"><i class="fa-solid ${providerIcon(row.provider)}"></i></div>
+                <div style="flex:1;min-width:0;">
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px;">
+                    <div style="font-size:13px;font-weight:800;">${providerLabel(row.provider)}</div>
+                    <span style="font-size:9px;font-weight:800;border-radius:99px;padding:3px 7px;background:${row.tone.bg};color:${row.tone.color};">${h(row.statusLabel)}</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--muted);line-height:1.6;">${h(row.detail)}</div>
+                  <div class="mono" style="font-size:10px;color:var(--muted);margin-top:5px;overflow-wrap:anywhere;">${h(row.account?.credential_ref||row.account?.metadata_json?.canonical_state||row.account?.metadata_json?.environment||'placeholder only')}</div>
+                </div>
+                <button class="btn btn-ghost btn-sm" onclick="toast('${providerLabel(row.provider)} is ${row.provider==='supabase'?'available for readback':'not live yet'}','i')">Inspect</button>
+              </div>`).join('')}
+          </div>
         </div>
       </div>
-      <div class="card-flat" style="padding:20px;">
-        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">Selected Client Setup</div>
+
+      <div class="card-flat" style="padding:20px;position:sticky;top:76px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
+          <div>
+            <div style="font-size:13px;font-weight:800;">Client Setup Focus</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px;">What the integrator would review before activation.</div>
+          </div>
+          <div class="mono" style="font-size:18px;font-weight:800;color:${setupPct===100?'var(--green)':'var(--amber)'};">${setupPct}%</div>
+        </div>
         <select class="inp" onchange="_curClientId=Number(this.value);renderAIConfigPage();showClientDetail(Number(this.value));" style="margin-bottom:12px;">
           ${D.clients.map(c=>`<option value="${c.id}" ${selected?.id===c.id?'selected':''}>${h(c.name)}</option>`).join('')}
         </select>
+        <div style="height:6px;background:var(--border);border-radius:99px;margin-bottom:12px;overflow:hidden;"><div style="height:100%;width:${setupPct}%;background:${setupPct===100?'var(--green)':'var(--amber)'};border-radius:99px;"></div></div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px;">
+          <div style="font-size:12px;font-weight:800;margin-bottom:8px;">${h(selected?.name||'No client selected')}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:var(--muted);">
+            <div><span style="color:var(--text);font-weight:700;">${(selectedSetup?.services||[]).length}</span><br>services</div>
+            <div><span style="color:var(--text);font-weight:700;">${(selectedSetup?.staff||[]).length}</span><br>staff</div>
+            <div><span style="color:var(--text);font-weight:700;">${(selectedSetup?.hours||[]).length}</span><br>hours rows</div>
+            <div><span style="color:var(--text);font-weight:700;">${(selectedSetup?.integrations||[]).length}</span><br>placeholders</div>
+          </div>
+        </div>
         ${renderSetupChecklist(selectedSetup)}
+        <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.18);border-radius:12px;padding:12px;margin-top:12px;">
+          <div style="font-size:11px;font-weight:800;color:var(--amber);margin-bottom:5px;">Activation boundary</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.55;">Beautiful does not mean live. This page does not register webhooks, call providers, route phone numbers, send SMS, or create real bookings.</div>
+        </div>
         <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
-          <button class="btn btn-ghost btn-sm" onclick="go('clients');showClientDetail(${selected.id})"><i class="fa-solid fa-sliders"></i>Edit setup</button>
+          <button class="btn btn-ghost btn-sm" onclick="go('clients');${selected?.id ? `showClientDetail(${selected.id})` : `toast('No client selected yet','i')`}"><i class="fa-solid fa-sliders"></i>Edit setup</button>
           ${isHostedDevMode()
             ? `<button class="btn btn-ghost btn-sm" onclick="toast('Hosted-dev dashboard is read-only','i')"><i class="fa-solid fa-lock"></i>Read only</button>`
-            : `<button class="btn btn-ghost btn-sm" onclick="previewPrompt(${selected.id})"><i class="fa-solid fa-eye"></i>Preview prompt</button>
-          <button class="btn btn-primary btn-sm" onclick="publishPromptLocally(${selected.id})"><i class="fa-solid fa-box-archive"></i>Publish locally</button>`}
+            : `<button class="btn btn-ghost btn-sm" onclick="${selected?.id ? `previewPrompt(${selected.id})` : `toast('No client selected yet','i')`}"><i class="fa-solid fa-eye"></i>Preview prompt</button>
+          <button class="btn btn-primary btn-sm" onclick="${selected?.id ? `publishPromptLocally(${selected.id})` : `toast('No client selected yet','i')`}"><i class="fa-solid fa-box-archive"></i>Publish locally</button>`}
         </div>
       </div>
     </div>`;
