@@ -720,7 +720,7 @@ header button[onclick="toggleDevDrop()"]:hover{border-color:var(--blue);backgrou
 
     <!-- AGENCY ROI -->
     <div class="slabel">AGENCY ROI</div>
-    <div class="roi-grid" style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:11px;margin-bottom:18px;">
+    <div class="roi-grid" id="agency-roi-grid" style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:11px;margin-bottom:18px;">
 
       <!-- Hero ROI card with 12-month line graph -->
       <div class="card" style="padding:16px;background:var(--hero-grad);position:relative;overflow:hidden;">
@@ -837,7 +837,7 @@ header button[onclick="toggleDevDrop()"]:hover{border-color:var(--blue);backgrou
     </div>
 
     <div class="slabel">WEBSITE PERFORMANCE</div>
-    <div class="overview-kpi-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:18px;">
+    <div class="overview-kpi-grid" id="website-performance-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:18px;">
       <div class="card" style="padding:13px;"><div style="font-size:10px;color:var(--muted);">Visitors Today</div><div class="mono" style="font-size:21px;font-weight:700;margin:3px 0;">312</div><div style="font-size:10px;color:var(--green);margin-bottom:7px;">+23% vs yesterday</div><div style="height:3px;background:var(--border);border-radius:9px;"><div class="fbar" style="width:100%;background:var(--blue);"></div></div></div>
       <div class="card" style="padding:13px;"><div style="font-size:10px;color:var(--muted);">Chat Started</div><div class="mono" style="font-size:21px;font-weight:700;margin:3px 0;">78</div><div style="font-size:10px;color:var(--muted);margin-bottom:7px;">25% of visitors</div><div style="height:3px;background:var(--border);border-radius:9px;"><div class="fbar" style="width:25%;background:var(--green);"></div></div></div>
       <div class="card" style="padding:13px;"><div style="font-size:10px;color:var(--muted);">Booking Initiated</div><div class="mono" style="font-size:21px;font-weight:700;margin:3px 0;">51</div><div style="font-size:10px;color:var(--amber);margin-bottom:7px;">16% of visitors</div><div style="height:3px;background:var(--border);border-radius:9px;"><div class="fbar" style="width:16%;background:var(--amber);"></div></div></div>
@@ -845,13 +845,13 @@ header button[onclick="toggleDevDrop()"]:hover{border-color:var(--blue);backgrou
     </div>
 
     <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:11px;">
-      <div class="card-flat" style="padding:16px;"><div style="font-size:11px;font-weight:600;margin-bottom:12px;">Today's Highlights</div><div style="display:flex;flex-direction:column;gap:8px;">
+      <div class="card-flat" id="today-highlights-card" style="padding:16px;"><div style="font-size:11px;font-weight:600;margin-bottom:12px;">Today's Highlights</div><div style="display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;gap:8px;font-size:12px;align-items:flex-start;"><div style="width:20px;height:20px;background:rgba(34,197,94,.12);color:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;">▲</div><div>Bright Smile Dental — record <strong>28 bookings</strong> today.<br><span style="font-size:10px;color:var(--muted);">Previous best was 22 · Apr 9</span></div></div>
         <div style="display:flex;gap:8px;font-size:12px;align-items:flex-start;"><div style="width:20px;height:20px;background:var(--blue-dim);color:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;">◎</div><div>Chat conversion at <strong>41%</strong> — best this month.<br><span style="font-size:10px;color:var(--muted);">Most chats asking about pricing and availability</span></div></div>
         <div style="display:flex;gap:8px;font-size:12px;align-items:flex-start;"><div style="width:20px;height:20px;background:rgba(244,63,94,.12);color:var(--rose);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;">▼</div><div>Luxe Style Salon — 4 after-hours calls went to voicemail.<br><span style="font-size:10px;color:var(--muted);">Retell routing config needs update · Dev_1 on it</span></div></div>
         <div style="display:flex;gap:8px;font-size:12px;align-items:flex-start;"><div style="width:20px;height:20px;background:rgba(168,85,247,.12);color:var(--purple);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;">★</div><div>34% of all bookings today happened <strong>after 9 PM</strong>.<br><span style="font-size:10px;color:var(--muted);">AI captured revenue humans would have missed</span></div></div>
       </div></div>
-      <div class="card-flat" style="padding:16px;"><div style="font-size:11px;font-weight:600;margin-bottom:12px;">Daily Summary</div><div style="font-size:12px;color:var(--muted);line-height:1.75;">AI handled <strong style="color:var(--text);">78 website chats</strong> and <strong style="color:var(--text);">94 phone calls</strong>. Booking conversion at <strong style="color:var(--green);">41%</strong> — best this month. <strong style="color:var(--text);">9 of 12</strong> agents fully active. 3 more clients going live this sprint.</div></div>
+      <div class="card-flat" id="daily-summary-card" style="padding:16px;"><div style="font-size:11px;font-weight:600;margin-bottom:12px;">Daily Summary</div><div style="font-size:12px;color:var(--muted);line-height:1.75;">AI handled <strong style="color:var(--text);">78 website chats</strong> and <strong style="color:var(--text);">94 phone calls</strong>. Booking conversion at <strong style="color:var(--green);">41%</strong> — best this month. <strong style="color:var(--text);">9 of 12</strong> agents fully active. 3 more clients going live this sprint.</div></div>
     </div>
   </div>
 
@@ -3292,6 +3292,68 @@ function updateKPIs(){
   const starterBar = document.getElementById('rpt-plan-starter-bar');
   if(proBar)     proBar.style.width     = Math.round((proSum     / maxPlan) * 100) + '%';
   if(starterBar) starterBar.style.width = Math.round((starterSum / maxPlan) * 100) + '%';
+
+  renderHostedOverviewTruth({total,callsToday,bookingsToday,activeAgents,building});
+}
+
+function renderHostedOverviewTruth({total,callsToday,bookingsToday,activeAgents,building}){
+  if(!D.supabaseLive||!isHostedDevMode())return;
+  const roiGrid=document.getElementById('agency-roi-grid');
+  if(roiGrid){
+    roiGrid.innerHTML=`
+      <div class="card" style="padding:16px;background:var(--hero-grad);position:relative;overflow:hidden;">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Agency ROI</div>
+        <div class="mono" style="font-size:26px;font-weight:700;color:var(--muted);margin-bottom:8px;">Not enough data yet</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.65;max-width:620px;">Hosted-dev is reading Supabase successfully, but revenue, ad spend, and cost-per-booking tracking are not connected to live providers yet.</div>
+      </div>
+      <div class="card" style="padding:16px;">
+        <div style="font-size:11px;font-weight:600;margin-bottom:4px;">Client Retention</div>
+        <div class="mono" style="font-size:24px;font-weight:700;color:var(--muted);margin-top:18px;">Pending</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.55;margin-top:8px;">Needs production client history before this can be honest.</div>
+      </div>
+      <div class="card" style="padding:16px;">
+        <div style="font-size:11px;font-weight:600;margin-bottom:4px;">Cost Efficiency</div>
+        <div class="mono" style="font-size:24px;font-weight:700;color:var(--muted);margin-top:18px;">Pending</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.55;margin-top:8px;">Provider usage and booking costs are not activated.</div>
+      </div>`;
+  }
+  const websiteGrid=document.getElementById('website-performance-grid');
+  if(websiteGrid){
+    const cards=[
+      ['Visitors Today','0','Website analytics not connected'],
+      ['Chat Started','0','Chat provider not connected'],
+      ['Booking Initiated','0','Booking provider not connected'],
+      ['Booking Completed',String(bookingsToday),'From hosted booking rows']
+    ];
+    websiteGrid.innerHTML=cards.map(([label,value,note])=>`
+      <div class="card" style="padding:13px;">
+        <div style="font-size:10px;color:var(--muted);">${label}</div>
+        <div class="mono" style="font-size:21px;font-weight:700;margin:3px 0;">${value}</div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:7px;">${note}</div>
+        <div style="height:3px;background:var(--border);border-radius:9px;"><div class="fbar" style="width:${Number(value)>0?'18':'0'}%;background:var(--blue);"></div></div>
+      </div>`).join('');
+  }
+  const highlights=document.getElementById('today-highlights-card');
+  if(highlights){
+    highlights.innerHTML=`
+      <div style="font-size:11px;font-weight:600;margin-bottom:12px;">Today's Highlights</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;gap:8px;font-size:12px;align-items:flex-start;">
+          <div style="width:20px;height:20px;background:var(--blue-dim);color:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;"><i class="fa-solid fa-database"></i></div>
+          <div>Hosted Supabase readback is working.<br><span style="font-size:10px;color:var(--muted);">${total} client, ${callsToday} calls, ${bookingsToday} bookings today.</span></div>
+        </div>
+        <div style="display:flex;gap:8px;font-size:12px;align-items:flex-start;">
+          <div style="width:20px;height:20px;background:rgba(245,158,11,.12);color:var(--amber);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;"><i class="fa-solid fa-plug-circle-xmark"></i></div>
+          <div>Live providers are still blocked.<br><span style="font-size:10px;color:var(--muted);">No Retell, Cal.com, n8n, Twilio, Dograh, or real customer traffic is active.</span></div>
+        </div>
+      </div>`;
+  }
+  const summary=document.getElementById('daily-summary-card');
+  if(summary){
+    summary.innerHTML=`
+      <div style="font-size:11px;font-weight:600;margin-bottom:12px;">Daily Summary</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.75;">Hosted-dev is connected to Supabase and currently shows <strong style="color:var(--text);">${total} client</strong>, <strong style="color:var(--text);">${activeAgents} active agent</strong>, <strong style="color:var(--text);">${callsToday} calls</strong>, and <strong style="color:var(--text);">${bookingsToday} bookings</strong> today. Provider activation is not live yet, so this preview is safe for QA but not production traffic.</div>`;
+  }
 }
 
 function go(page){
