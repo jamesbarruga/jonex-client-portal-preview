@@ -291,6 +291,41 @@ header span[style*="background:var(--green)"]{animation:livePulse 2s infinite;}
 .photo-drop{border:2px dashed var(--border2);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;}
 .photo-drop:hover{border-color:var(--blue);background:var(--blue-dim);}
 .integration-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;}
+.ai-dream-surface{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.68);border-radius:28px;padding:18px;background:linear-gradient(135deg,rgba(247,252,255,.92),rgba(240,247,243,.78) 48%,rgba(255,248,231,.86));box-shadow:0 24px 70px rgba(14,28,24,.24),inset 0 1px 0 rgba(255,255,255,.86);backdrop-filter:blur(24px) saturate(1.2);-webkit-backdrop-filter:blur(24px) saturate(1.2);color:#17201d;}
+.ai-dream-surface:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(18,41,35,.045) 1px,transparent 1px),linear-gradient(0deg,rgba(18,41,35,.035) 1px,transparent 1px),linear-gradient(120deg,rgba(255,255,255,.2),rgba(255,255,255,0) 45%);background-size:44px 44px,44px 44px,100% 100%;mask-image:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,.1));}
+.ai-dream-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(320px,.75fr);gap:14px;align-items:start;}
+.ai-glass-panel{border:1px solid rgba(255,255,255,.72);border-radius:20px;background:rgba(255,255,255,.48);box-shadow:0 16px 42px rgba(30,48,42,.12),inset 0 1px 0 rgba(255,255,255,.74);backdrop-filter:blur(18px) saturate(1.12);-webkit-backdrop-filter:blur(18px) saturate(1.12);}
+.ai-hero{min-height:220px;padding:24px;display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:18px;align-items:end;background:linear-gradient(135deg,rgba(255,255,255,.58),rgba(255,255,255,.24)),rgba(255,255,255,.35);}
+.ai-kicker{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#2c628f;margin-bottom:8px;}
+.ai-dream-title{font-size:34px;line-height:1.02;font-weight:800;letter-spacing:0;margin:0 0 12px;color:#13211d;max-width:680px;}
+.ai-dream-copy{font-size:13px;line-height:1.72;color:#56635d;max-width:660px;}
+.ai-env-card{align-self:stretch;border:1px solid rgba(255,255,255,.72);border-radius:18px;padding:15px;background:rgba(18,41,35,.9);color:#fffaf0;box-shadow:inset 0 1px 0 rgba(255,255,255,.18);}
+.ai-provider-grid{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:10px;margin-top:12px;}
+.ai-provider-card{min-height:128px;padding:14px;border:1px solid rgba(255,255,255,.7);border-radius:18px;background:rgba(255,255,255,.5);box-shadow:0 12px 28px rgba(30,48,42,.08),inset 0 1px 0 rgba(255,255,255,.8);display:flex;flex-direction:column;justify-content:space-between;transition:transform .18s,box-shadow .18s;}
+.ai-provider-card:hover{transform:translateY(-2px);box-shadow:0 18px 38px rgba(30,48,42,.14),inset 0 1px 0 rgba(255,255,255,.9);}
+.ai-provider-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.ai-provider-icon{width:38px;height:38px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:15px;background:#122923;color:#fffaf0;box-shadow:inset 0 1px 0 rgba(255,255,255,.18);}
+.ai-status-pill{font-size:9px;font-weight:800;border-radius:99px;padding:5px 8px;white-space:nowrap;background:rgba(18,41,35,.08);color:#52615b;}
+.ai-status-pill.ready{background:#d9f1e5;color:#176044;}
+.ai-status-pill.waiting{background:#ffe8bd;color:#8a4d07;}
+.ai-status-pill.deferred{background:#e9edf1;color:#66716b;}
+.ai-provider-name{font-size:13px;font-weight:800;color:#17201d;margin-bottom:3px;}
+.ai-provider-note{font-size:10px;color:#66716b;line-height:1.45;}
+.ai-path{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px;}
+.ai-path-step{position:relative;padding:13px;border:1px solid rgba(18,41,35,.1);border-radius:16px;background:rgba(255,255,255,.46);min-height:94px;}
+.ai-path-step:not(:last-child):after{content:"";position:absolute;right:-10px;top:50%;width:10px;height:1px;background:rgba(18,41,35,.24);}
+.ai-path-label{font-size:10px;color:#66716b;text-transform:uppercase;letter-spacing:.08em;font-weight:800;margin-bottom:6px;}
+.ai-path-title{font-size:13px;color:#17201d;font-weight:800;margin-bottom:4px;}
+.ai-path-copy{font-size:10px;line-height:1.45;color:#66716b;}
+.ai-side-panel{padding:18px;position:sticky;top:76px;}
+.ai-progress-ring{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#23845f var(--pct),rgba(18,41,35,.12) 0);box-shadow:inset 0 1px 0 rgba(255,255,255,.6);}
+.ai-progress-ring span{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:rgba(255,253,247,.9);font-weight:800;color:#17201d;}
+.ai-readiness-list{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+.ai-readiness-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px;border-radius:14px;background:rgba(255,255,255,.45);border:1px solid rgba(18,41,35,.08);}
+.ai-readiness-row .mini{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:rgba(18,41,35,.08);color:#17201d;}
+.ai-small-title{font-size:12px;font-weight:800;color:#17201d;}
+.ai-small-copy{font-size:10px;color:#66716b;line-height:1.45;margin-top:2px;}
+.ai-boundary{margin-top:12px;padding:12px;border-radius:16px;border:1px solid rgba(178,106,16,.18);background:rgba(255,232,189,.42);color:#6f430b;}
 .setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);}
 .setting-row:last-child{border-bottom:none;}
 .roi-pulse{animation:rp 2s ease-in-out infinite;}
@@ -439,6 +474,14 @@ header span[style*="background:var(--green)"]{animation:livePulse 2s infinite;}
   #aiconfig-local-status .integration-card > div:nth-child(2){grid-column:2 / 4;min-width:0;}
   #aiconfig-local-status .integration-card > div:nth-child(3){grid-column:2;grid-row:2;white-space:normal!important;margin-top:6px;}
   #aiconfig-local-status .integration-card > button{grid-column:3;grid-row:2;margin-left:0!important;}
+  .ai-dream-surface{padding:14px;border-radius:22px;}
+  .ai-dream-grid{grid-template-columns:1fr!important;}
+  .ai-hero{grid-template-columns:1fr!important;padding:20px;min-height:auto;}
+  .ai-dream-title{font-size:28px;}
+  .ai-provider-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .ai-path{grid-template-columns:1fr;}
+  .ai-path-step:not(:last-child):after{display:none;}
+  .ai-side-panel{position:static;}
 
   /* No hover lift on touch — feels stuck otherwise */
   .card:hover{transform:none;}
@@ -1275,7 +1318,7 @@ header button[onclick="toggleDevDrop()"]:hover{border-color:var(--blue);backgrou
   <!-- ══ AI & INTEGRATIONS ══ -->
   <div id="page-aiconfig" class="page">
     <div style="font-size:20px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px;">AI & Integrations</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:20px;">A polished, truthful control layer for client setup, receptionist prompts, and provider readiness.</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px;">Client setup, prompt memory, and provider lanes in one place.</div>
     <div id="aiconfig-local-status"></div>
   </div>
 
@@ -2692,11 +2735,18 @@ function renderAIConfigPage(){
   const target=document.getElementById('aiconfig-local-status');
   if(!target)return;
   if(!D.supabaseLive){
-    target.innerHTML=`<div class="card-flat" style="padding:22px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(79,142,247,.12),rgba(168,85,247,.08) 52%,rgba(17,17,21,.96));">
-      <div style="max-width:680px;position:relative;">
-        <div style="font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.1em;font-weight:800;margin-bottom:8px;">Preview Mode</div>
-        <div style="font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:8px;">AI & Integrations needs a Supabase session</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.7;">This page is intentionally quiet in demo mode. Open the hosted dashboard and sign in to see the real Supabase-backed setup state, provider placeholders, and client configuration map.</div>
+    target.innerHTML=`<div class="ai-dream-surface">
+      <div class="ai-glass-panel ai-hero">
+        <div>
+          <div class="ai-kicker">Preview Mode</div>
+          <h2 class="ai-dream-title">The operating layer appears after sign-in.</h2>
+          <div class="ai-dream-copy">Open the hosted dashboard with an approved session to see the real Supabase-backed setup state, client prompt map, and provider lanes.</div>
+        </div>
+        <div class="ai-env-card">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;opacity:.72;margin-bottom:8px;">Status</div>
+          <div style="font-size:23px;font-weight:800;line-height:1.05;">Waiting for session</div>
+          <div style="font-size:11px;color:#cce8dc;margin-top:10px;">No provider calls in preview mode.</div>
+        </div>
       </div>
     </div>`;
     return;
@@ -2710,6 +2760,8 @@ function renderAIConfigPage(){
     const display=integrationDisplay(account);
     const tone=statusTone(account.status,account.provider);
     const isSupabase=provider==='supabase';
+    const dreamStatus=isSupabase ? 'Readback live' : provider==='twilio' ? 'Deferred' : provider==='n8n' ? 'Manual setup' : 'Waiting for keys';
+    const dreamClass=isSupabase ? 'ready' : provider==='twilio' ? 'deferred' : 'waiting';
     const statusLabel=isSupabase
       ? (isHostedDevMode()?'Hosted readback':'Local source')
       : display.label;
@@ -2729,102 +2781,141 @@ function renderAIConfigPage(){
       n8n:'Manual setup later: no API call.',
       twilio:'Deferred: no SMS traffic.'
     }[provider]||'Placeholder only.';
-    return {provider,account,tone,statusLabel,detail,subline};
+    return {provider,account,tone,statusLabel,detail,subline,dreamStatus,dreamClass};
   });
   const setupItems=setupCompleteness(selectedSetup);
   const completeCount=setupItems.filter(item=>item.ok).length;
   const totalSetup=setupItems.length||1;
   const setupPct=Math.round((completeCount/totalSetup)*100);
   target.innerHTML=`
-    <div style="display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;align-items:start;">
-      <div style="display:flex;flex-direction:column;gap:14px;min-width:0;">
-        <div class="card-flat" style="padding:22px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(79,142,247,.14),rgba(17,17,21,.96) 46%,rgba(34,197,94,.08));">
-          <div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;position:relative;">
+    <div class="ai-dream-surface">
+      <div class="ai-dream-grid">
+        <div style="display:flex;flex-direction:column;gap:14px;min-width:0;">
+          <div class="ai-glass-panel ai-hero">
             <div>
-              <div style="font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:.1em;font-weight:800;margin-bottom:8px;">AI Receptionist Control Layer</div>
-              <div style="font-size:25px;font-weight:800;letter-spacing:-.035em;margin-bottom:8px;">Every provider, clearly mapped.</div>
-              <div style="font-size:13px;color:var(--muted);line-height:1.7;max-width:690px;">This is the real setup surface for JoNeX. Supabase is the source of truth. Voice, booking, automation, and SMS providers stay beautifully visible here, but their labels stay honest until keys and manual provider setup are approved.</div>
+              <div class="ai-kicker">JoNeX AI Operating Layer</div>
+              <h2 class="ai-dream-title">The receptionist engine has a home.</h2>
+              <div class="ai-dream-copy">Business setup, prompt memory, provider lanes, and activation boundaries live together here. Supabase is awake for hosted-dev QA; the outside providers stay staged until keys and manual setup are approved.</div>
             </div>
-            <div style="flex:0 0 150px;background:rgba(8,8,10,.46);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;">
-              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Environment</div>
-              <div style="font-size:18px;font-weight:800;margin-top:4px;">${isHostedDevMode()?'Hosted Dev':'Local'}</div>
-              <div style="font-size:10px;color:${isHostedDevMode()?'var(--blue)':'var(--green)'};margin-top:6px;">${isHostedDevMode()?'read-only QA':'setup writes allowed'}</div>
+            <div class="ai-env-card">
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;opacity:.72;margin-bottom:8px;">Environment</div>
+              <div style="font-size:24px;font-weight:800;line-height:1.05;">${isHostedDevMode()?'Hosted Dev':'Local Studio'}</div>
+              <div style="font-size:11px;color:#cce8dc;margin-top:10px;">${isHostedDevMode()?'Read-only QA surface':'Setup drafts and prompt previews'}</div>
+              <div style="height:1px;background:rgba(255,255,255,.18);margin:14px 0;"></div>
+              <div style="display:flex;justify-content:space-between;gap:12px;font-size:11px;color:#f7f0e4;">
+                <span>Active store</span><strong>${configuredCount||1}/5</strong>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;">
-          ${providerRows.map(row=>`
-            <div class="card" style="padding:14px;min-height:108px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0));">
-              <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
-                <div style="width:34px;height:34px;background:${row.tone.bg};border:1px solid rgba(255,255,255,.06);border-radius:10px;display:flex;align-items:center;justify-content:center;color:${row.tone.color};font-size:14px;"><i class="fa-solid ${providerIcon(row.provider)}"></i></div>
-                <span style="font-size:9px;font-weight:800;border-radius:99px;padding:4px 7px;background:${row.tone.bg};color:${row.tone.color};white-space:nowrap;">${h(row.statusLabel)}</span>
-              </div>
-              <div>
-                <div style="font-size:13px;font-weight:800;margin-bottom:3px;">${providerLabel(row.provider)}</div>
-                <div style="font-size:10px;color:var(--muted);line-height:1.45;">${h(row.subline)}</div>
-              </div>
-            </div>`).join('')}
-        </div>
-
-        <div class="card-flat" style="padding:20px;">
-          <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;">
-            <div>
-              <div style="font-size:13px;font-weight:800;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-route" style="color:var(--blue);"></i>Provider Readiness Map</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:3px;">A truthful control-room view of what is connected, mapped, deferred, and blocked.</div>
-            </div>
-            <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">No live provider traffic</span>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="ai-provider-grid">
             ${providerRows.map(row=>`
-              <div class="integration-card" style="align-items:flex-start;background:linear-gradient(90deg,rgba(255,255,255,.025),rgba(255,255,255,0));">
-                <div style="width:42px;height:42px;background:${row.tone.bg};border-radius:12px;display:flex;align-items:center;justify-content:center;color:${row.tone.color};font-size:16px;flex-shrink:0;"><i class="fa-solid ${providerIcon(row.provider)}"></i></div>
-                <div style="flex:1;min-width:0;">
-                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px;">
-                    <div style="font-size:13px;font-weight:800;">${providerLabel(row.provider)}</div>
-                    <span style="font-size:9px;font-weight:800;border-radius:99px;padding:3px 7px;background:${row.tone.bg};color:${row.tone.color};">${h(row.statusLabel)}</span>
-                  </div>
-                  <div style="font-size:11px;color:var(--muted);line-height:1.6;">${h(row.detail)}</div>
-                  <div class="mono" style="font-size:10px;color:var(--muted);margin-top:5px;overflow-wrap:anywhere;">${h(row.account?.credential_ref||row.account?.metadata_json?.canonical_state||row.account?.metadata_json?.environment||'placeholder only')}</div>
+              <div class="ai-provider-card">
+                <div class="ai-provider-top">
+                  <div class="ai-provider-icon"><i class="fa-solid ${providerIcon(row.provider)}"></i></div>
+                  <span class="ai-status-pill ${row.dreamClass}">${h(row.dreamStatus)}</span>
                 </div>
-                <button class="btn btn-ghost btn-sm" onclick="toast('${providerLabel(row.provider)} is ${row.provider==='supabase'?'available for readback':'not live yet'}','i')">Inspect</button>
-              </div>`).join('')}
+                <div>
+                  <div class="ai-provider-name">${providerLabel(row.provider)}</div>
+                  <div class="ai-provider-note">${h(row.subline)}</div>
+                </div>
+              </div>
+            `).join('')}
           </div>
-        </div>
-      </div>
 
-      <div class="card-flat" style="padding:20px;position:sticky;top:76px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
-          <div>
-            <div style="font-size:13px;font-weight:800;">Client Setup Focus</div>
-            <div style="font-size:10px;color:var(--muted);margin-top:2px;">What the integrator would review before activation.</div>
+          <div class="ai-glass-panel" style="padding:18px;">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px;">
+              <div>
+                <div class="ai-kicker" style="margin-bottom:6px;">Provider Runway</div>
+                <div style="font-size:17px;font-weight:800;color:#17201d;">How the receptionist becomes real</div>
+              </div>
+              <span class="ai-status-pill waiting">No live provider traffic</span>
+            </div>
+            <div class="ai-path">
+              <div class="ai-path-step">
+                <div class="ai-path-label">01</div>
+                <div class="ai-path-title">Client setup</div>
+                <div class="ai-path-copy">Profile, services, staff, and hours are read from Supabase.</div>
+              </div>
+              <div class="ai-path-step">
+                <div class="ai-path-label">02</div>
+                <div class="ai-path-title">Prompt memory</div>
+                <div class="ai-path-copy">The receptionist draft is built from real setup data.</div>
+              </div>
+              <div class="ai-path-step">
+                <div class="ai-path-label">03</div>
+                <div class="ai-path-title">Provider lanes</div>
+                <div class="ai-path-copy">Retell, Cal.com, n8n, and Twilio stay mapped but blocked.</div>
+              </div>
+              <div class="ai-path-step">
+                <div class="ai-path-label">04</div>
+                <div class="ai-path-title">Activation</div>
+                <div class="ai-path-copy">Keys, webhooks, routing, and real traffic wait for approval.</div>
+              </div>
+            </div>
           </div>
-          <div class="mono" style="font-size:18px;font-weight:800;color:${setupPct===100?'var(--green)':'var(--amber)'};">${setupPct}%</div>
-        </div>
-        <select class="inp" onchange="_curClientId=Number(this.value);renderAIConfigPage();showClientDetail(Number(this.value));" style="margin-bottom:12px;">
-          ${D.clients.map(c=>`<option value="${c.id}" ${selected?.id===c.id?'selected':''}>${h(c.name)}</option>`).join('')}
-        </select>
-        <div style="height:6px;background:var(--border);border-radius:99px;margin-bottom:12px;overflow:hidden;"><div style="height:100%;width:${setupPct}%;background:${setupPct===100?'var(--green)':'var(--amber)'};border-radius:99px;"></div></div>
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px;">
-          <div style="font-size:12px;font-weight:800;margin-bottom:8px;">${h(selected?.name||'No client selected')}</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:var(--muted);">
-            <div><span style="color:var(--text);font-weight:700;">${(selectedSetup?.services||[]).length}</span><br>services</div>
-            <div><span style="color:var(--text);font-weight:700;">${(selectedSetup?.staff||[]).length}</span><br>staff</div>
-            <div><span style="color:var(--text);font-weight:700;">${(selectedSetup?.hours||[]).length}</span><br>hours rows</div>
-            <div><span style="color:var(--text);font-weight:700;">${(selectedSetup?.integrations||[]).length}</span><br>placeholders</div>
+
+          <div class="ai-glass-panel" style="padding:18px;">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;">
+              <div>
+                <div class="ai-kicker" style="margin-bottom:6px;">Readiness Map</div>
+                <div style="font-size:17px;font-weight:800;color:#17201d;">Beautiful, but never pretending.</div>
+              </div>
+              <span class="ai-status-pill ready">Supabase QA active</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              ${providerRows.map(row=>`
+                <div class="ai-readiness-row">
+                  <div class="mini"><i class="fa-solid ${providerIcon(row.provider)}"></i></div>
+                  <div>
+                    <div class="ai-small-title">${providerLabel(row.provider)}</div>
+                    <div class="ai-small-copy">${h(row.detail)}</div>
+                    <div class="mono" style="font-size:10px;color:#66716b;margin-top:4px;overflow-wrap:anywhere;">${h(row.account?.credential_ref||row.account?.metadata_json?.canonical_state||row.account?.metadata_json?.environment||'placeholder only')}</div>
+                  </div>
+                  <span class="ai-status-pill ${row.dreamClass}">${h(row.statusLabel)}</span>
+                </div>
+              `).join('')}
+            </div>
           </div>
         </div>
-        ${renderSetupChecklist(selectedSetup)}
-        <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.18);border-radius:12px;padding:12px;margin-top:12px;">
-          <div style="font-size:11px;font-weight:800;color:var(--amber);margin-bottom:5px;">Activation boundary</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.55;">Beautiful does not mean live. This page does not register webhooks, call providers, route phone numbers, send SMS, or create real bookings.</div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
-          <button class="btn btn-ghost btn-sm" onclick="go('clients');${selected?.id ? `showClientDetail(${selected.id})` : `toast('No client selected yet','i')`}"><i class="fa-solid fa-sliders"></i>Edit setup</button>
-          ${isHostedDevMode()
-            ? `<button class="btn btn-ghost btn-sm" onclick="toast('Hosted-dev dashboard is read-only','i')"><i class="fa-solid fa-lock"></i>Read only</button>`
-            : `<button class="btn btn-ghost btn-sm" onclick="${selected?.id ? `previewPrompt(${selected.id})` : `toast('No client selected yet','i')`}"><i class="fa-solid fa-eye"></i>Preview prompt</button>
-          <button class="btn btn-primary btn-sm" onclick="${selected?.id ? `publishPromptLocally(${selected.id})` : `toast('No client selected yet','i')`}"><i class="fa-solid fa-box-archive"></i>Publish locally</button>`}
+
+        <div class="ai-glass-panel ai-side-panel">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px;">
+            <div>
+              <div class="ai-kicker" style="margin-bottom:6px;">Client Focus</div>
+              <div style="font-size:18px;font-weight:800;color:#17201d;">${h(selected?.name||'No client selected')}</div>
+              <div class="ai-small-copy">Setup state for the selected business.</div>
+            </div>
+            <div class="ai-progress-ring" style="--pct:${setupPct}%"><span>${setupPct}%</span></div>
+          </div>
+          <select class="inp" onchange="_curClientId=Number(this.value);renderAIConfigPage();showClientDetail(Number(this.value));" style="margin-bottom:12px;background:rgba(255,255,255,.65);border-color:rgba(18,41,35,.12);color:#17201d;">
+            ${D.clients.map(c=>`<option value="${c.id}" ${selected?.id===c.id?'selected':''}>${h(c.name)}</option>`).join('')}
+          </select>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;">
+            <div class="ai-path-step" style="min-height:auto;"><div class="ai-path-label">Services</div><div class="ai-path-title">${(selectedSetup?.services||[]).length}</div></div>
+            <div class="ai-path-step" style="min-height:auto;"><div class="ai-path-label">Staff</div><div class="ai-path-title">${(selectedSetup?.staff||[]).length}</div></div>
+            <div class="ai-path-step" style="min-height:auto;"><div class="ai-path-label">Hours</div><div class="ai-path-title">${(selectedSetup?.hours||[]).length}</div></div>
+            <div class="ai-path-step" style="min-height:auto;"><div class="ai-path-label">Lanes</div><div class="ai-path-title">${providerRows.length}</div></div>
+          </div>
+          <div class="ai-readiness-list">
+            ${setupItems.map(item=>`
+              <div class="ai-readiness-row" style="grid-template-columns:28px minmax(0,1fr);">
+                <div class="mini" style="width:28px;height:28px;border-radius:9px;background:${item.ok?'#d9f1e5':'rgba(18,41,35,.08)'};color:${item.ok?'#176044':'#8a958e'};"><i class="fa-solid ${item.ok?'fa-check':'fa-minus'}"></i></div>
+                <div class="ai-small-title" style="font-size:11px;color:${item.ok?'#17201d':'#66716b'};">${h(item.label)}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="ai-boundary">
+            <div style="font-size:11px;font-weight:800;margin-bottom:5px;">Activation boundary</div>
+            <div style="font-size:11px;line-height:1.55;">This page does not register webhooks, call providers, route phone numbers, send SMS, or create real bookings.</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+            <button class="btn btn-ghost btn-sm" onclick="go('clients');${selected?.id ? `showClientDetail(${selected.id})` : `toast('No client selected yet','i')`}" style="background:rgba(255,255,255,.58);border-color:rgba(18,41,35,.12);color:#17201d;"><i class="fa-solid fa-sliders"></i>Edit setup</button>
+            ${isHostedDevMode()
+              ? `<button class="btn btn-ghost btn-sm" onclick="toast('Hosted-dev dashboard is read-only','i')" style="background:#122923;color:#fffaf0;border-color:#122923;"><i class="fa-solid fa-lock"></i>Read only</button>`
+              : `<button class="btn btn-ghost btn-sm" onclick="${selected?.id ? `previewPrompt(${selected.id})` : `toast('No client selected yet','i')`}" style="background:rgba(255,255,255,.58);border-color:rgba(18,41,35,.12);color:#17201d;"><i class="fa-solid fa-eye"></i>Preview prompt</button>
+            <button class="btn btn-primary btn-sm" onclick="${selected?.id ? `publishPromptLocally(${selected.id})` : `toast('No client selected yet','i')`}"><i class="fa-solid fa-box-archive"></i>Publish locally</button>`}
+          </div>
         </div>
       </div>
     </div>`;
