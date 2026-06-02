@@ -3045,6 +3045,9 @@ async function loadSupabaseDashboardDataOnce(){
   const session=await ensureSupabaseSession(client);
   if(!session)return false;
   D.supabaseClient=client;
+  if(isHostedDevMode()&&location.hash.includes('access_token')){
+    await wait(1800);
+  }
 
   const baseRequests=await Promise.all([
     client.from('profiles').select('id,email,auth_user_id').eq('email',config.email).single(),
